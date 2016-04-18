@@ -8,6 +8,10 @@ class Board
 
   end
 
+  def rows
+    @grid
+  end
+
   def move(start, end_pos)
     piece = self[start]
     raise InvalidMove if piece.nil?
@@ -26,5 +30,9 @@ class Board
   def []=(pos, value)
     row, col = *pos
     grid[row] && (grid[row][col] = value)
+  end
+
+  def in_bounds?(pos)
+    pos.all? { |coord| coord.between?(0, 7) }
   end
 end
