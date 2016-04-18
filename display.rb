@@ -6,6 +6,7 @@ class Display
 
   def initialize(board)
     @board = board
+    @selected = false
     @cursor_pos = [0, 0]
   end
 
@@ -13,7 +14,7 @@ class Display
   def build_row(row, i)
     row.map.with_index do |piece, j|
       color_options = color_tile(i, j)
-      (piece || "   ").colorize(color_options) # TODO: fix this 
+      ( "   ").colorize(color_options) # TODO: fix this
     end
   end
 
