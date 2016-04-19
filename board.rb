@@ -2,8 +2,9 @@ require_relative "pieces"
 
 class Board
 
-  def initialize
-    @grid = Array.new(8) { Array.new(8) }
+  def initialize(grid = nil)
+    grid ||= Array.new(8) { Array.new(8) }
+    @grid = grid
     # populate
   end
 
@@ -42,6 +43,16 @@ class Board
     @grid
   end
 
+  def dup
+    duped_board = Board.new
+    rows.each_with_index do |row, row_idx|
+      row.each_with_index do |piece, col|
+        piece.dup.add_to_board(duped_board) unless piece.nil?
+      end
+    end
+    duped_board
+  end
+
   def move(start, end_pos)
     piece = self[start]
     raise InvalidMove if piece.nil?
@@ -50,6 +61,7 @@ class Board
     self[end_pos] = piece
     self[start] = nil
     piece.position = end_pos
+    self
   end
 
   def [](pos)
@@ -69,7 +81,7 @@ class Board
   def in_check?(color)
     # find kings position
     king_pos = find_king(color)
-    find_enemy_pieces(color).any? { |piece| piece.moves.include?(king_pos) }
+    enemy_pieces(color).any? { |piece| piece.moves.include?(king_pos) }
   end
 
   def find_king(color)
@@ -80,11 +92,23 @@ class Board
     nil
   end
 
-  def find_enemy_pieces(color)
+  def enemy_pieces(color)
     pieces = []
     rows.each do |row|
       row.each { |t| pieces << t unless t.nil? || t.color == color }
     end
     pieces
+  end
+
+  def friendly_pieces(color)
+    pieces = []
+    rows.each do |row|
+      row.each { |t| pieces << t unless t.nil? || t.color != color }
+    end
+    pieces
+  end
+
+  def checkmate?(color)
+    in_check?(color) && friendly_pieces(color).all? {|pi| pi.valid_moves.empty? }
   end
 end

@@ -1,7 +1,8 @@
 require "byebug"
 
 class Piece
-  attr_reader :position, :board, :color
+  attr_reader :board, :color
+  attr_accessor :position
 
   def initialize(position, board, color)
     @position = position
@@ -12,6 +13,19 @@ class Piece
 
   def self.step_in_direction(direction, position)
     [direction[0] + position[0], direction[1] + position[1]]
+  end
+
+  def add_to_board(board)
+    @board = board
+    board[position] = self
+  end
+
+  def move_into_check?(ending_position)
+    @board.dup.move(position, ending_position).in_check?(color)
+  end
+
+  def valid_moves
+    moves.delete_if { |move| move_into_check?(move) }
   end
 
 end
