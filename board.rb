@@ -4,7 +4,7 @@ class Board
 
   def initialize
     @grid = Array.new(8) { Array.new(8) }
-    populate
+    # populate
   end
 
   def populate
@@ -64,5 +64,27 @@ class Board
 
   def in_bounds?(pos)
     pos.all? { |coord| coord.between?(0, 7) }
+  end
+
+  def in_check?(color)
+    # find kings position
+    king_pos = find_king(color)
+    find_enemy_pieces(color).any? { |piece| piece.moves.include?(king_pos) }
+  end
+
+  def find_king(color)
+    rows.each_with_index do |row, row_idx|
+       col = row.index { |piece| piece.is_a?(King) && piece.color == color }
+       return [row_idx, col] unless col.nil?
+    end
+    nil
+  end
+
+  def find_enemy_pieces(color)
+    pieces = []
+    rows.each do |row|
+      row.each { |t| pieces << t unless t.nil? || t.color == color }
+    end
+    pieces
   end
 end
