@@ -38,7 +38,7 @@ module Cursorable
     when :ctrl_c
       exit 0
     when :return, :space
-      @cursor_pos
+      handle_select
     when :left, :right, :up, :down
       update_pos(MOVES[key])
       nil
@@ -46,6 +46,7 @@ module Cursorable
       puts key
     end
   end
+
 
   def read_char
     STDIN.echo = false

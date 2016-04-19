@@ -21,7 +21,7 @@ class Piece
   end
 
   def move_into_check?(ending_position)
-    @board.dup.move(position, ending_position).in_check?(color)
+    @board.dup.move!(position, ending_position).in_check?(color)
   end
 
   def valid_moves
@@ -69,7 +69,7 @@ class Bishop < SlidingPiece
   end
 
   def to_s
-    " #{(color == :white ? "\u2657" : "\u265D").encode('utf-8')} "
+    " #{(color == :black ? "\u2657" : "\u265D").encode('utf-8')} "
   end
 end
 
@@ -80,7 +80,7 @@ class Rook < SlidingPiece
   end
 
   def to_s
-    " #{(color == :white ? "\u2656" : "\u265C").encode('utf-8')} "
+    " #{(color == :black ? "\u2656" : "\u265C").encode('utf-8')} "
   end
 end
 
@@ -91,7 +91,7 @@ class Queen < SlidingPiece
   end
 
   def to_s
-    " #{(color == :white ? "\u2655" : "\u265B").encode('utf-8')} "
+    " #{(color == :black ? "\u2655" : "\u265B").encode('utf-8')} "
   end
 end
 
@@ -119,7 +119,7 @@ class King < SteppingPiece
   end
 
   def to_s
-    " #{(color == :white ? "\u2654" : "\u265A").encode('utf-8')} "
+    " #{(color == :black ? "\u2654" : "\u265A").encode('utf-8')} "
   end
 end
 
@@ -130,7 +130,7 @@ class Knight < SteppingPiece
   end
 
   def to_s
-    " #{(color == :white ? "\u2658" : "\u265E").encode('utf-8')} "
+    " #{(color == :black ? "\u2658" : "\u265E").encode('utf-8')} "
   end
 end
 
@@ -139,6 +139,7 @@ class Pawn < Piece
   def moves
     moves = []
     row_change = color == :white ? -1 : 1
+    starting_row = color == :white ? 6 : 1
 
     forward = Piece.step_in_direction([row_change, 0], position)
     moves << forward if board[forward].nil?
@@ -148,20 +149,16 @@ class Pawn < Piece
       moves << pos if board[pos] && board[pos].color != self.color
     end
 
-    if color == :white and position[0] == 6
-      pos = Piece.step_in_direction([-2, 0], position)
+    if position[0] == starting_row
+      pos = Piece.step_in_direction([row_change * 2, 0], position)
       moves << pos if board[pos].nil?
     end
 
-    if color == :black and position[0] == 1
-      pos = Piece.step_in_direction([2, 0], position)
-      moves << pos if board[pos].nil?
-    end
     moves
   end
 
   def to_s
-    " #{(color == :white ? "\u2659" : "\u265F").encode('utf-8')} "
+    " #{(color == :black ? "\u2659" : "\u265F").encode('utf-8')} "
   end
 
 end

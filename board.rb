@@ -1,5 +1,8 @@
 require_relative "pieces"
 
+class InvalidMove < StandardError
+end
+
 class Board
 
   def initialize(grid = nil)
@@ -15,28 +18,28 @@ class Board
       Pawn.new([1, col], self, :black)
     end
 
-    Rook.new([0,0], self, :black)
-    Rook.new([0,7], self, :black)
-    Knight.new([0,1], self, :black)
-    Knight.new([0,6], self, :black)
-    Bishop.new([0,5], self, :black)
-    Bishop.new([0,2], self, :black)
-    Queen.new([0,3], self, :black)
-    King.new([0,4], self, :black)
+    Rook.new([0, 0], self, :black)
+    Rook.new([0, 7], self, :black)
+    Knight.new([0, 1], self, :black)
+    Knight.new([0, 6], self, :black)
+    Bishop.new([0, 5], self, :black)
+    Bishop.new([0, 2], self, :black)
+    Queen.new([0, 3], self, :black)
+    King.new([0, 4], self, :black)
 
     # populate white pieces
     rows[6].each_index do |col|
       Pawn.new([6, col], self, :white)
     end
 
-    Rook.new([7,0], self, :white)
-    Rook.new([7,7], self, :white)
-    Knight.new([7,1], self, :white)
-    Knight.new([7,6], self, :white)
-    Bishop.new([7,5], self, :white)
-    Bishop.new([7,2], self, :white)
-    Queen.new([7,3], self, :white)
-    King.new([7,4], self, :white)
+    Rook.new([7, 0], self, :white)
+    Rook.new([7, 7], self, :white)
+    Knight.new([7, 1], self, :white)
+    Knight.new([7, 6], self, :white)
+    Bishop.new([7, 5], self, :white)
+    Bishop.new([7, 2], self, :white)
+    Queen.new([7, 3], self, :white)
+    King.new([7, 4], self, :white)
   end
 
   def rows
@@ -48,12 +51,26 @@ class Board
     rows.each_with_index do |row, row_idx|
       row.each_with_index do |piece, col|
         piece.dup.add_to_board(duped_board) unless piece.nil?
+        # piece.class.new
       end
     end
     duped_board
   end
 
   def move(start, end_pos)
+    piece = self[start]
+
+    unless piece && piece.valid_moves.include?(end_pos)
+      raise InvalidMove.new("That's an invalid move. Sorry.")
+    end
+
+    self[end_pos] = piece
+    self[start] = nil
+    piece.position = end_pos
+    self
+  end
+
+  def move!(start, end_pos)
     piece = self[start]
     raise InvalidMove if piece.nil?
     raise InvalidMove unless piece.moves.include?(end_pos)
@@ -65,12 +82,12 @@ class Board
   end
 
   def [](pos)
-    row, col = *pos
+    row, col = pos
     @grid[row] && @grid[row][col]
   end
 
   def []=(pos, value)
-    row, col = *pos
+    row, col = pos
     @grid[row] && (@grid[row][col] = value)
   end
 
