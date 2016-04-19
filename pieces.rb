@@ -1,13 +1,18 @@
 require "byebug"
 
 class Piece
-  attr_reader :board, :color
-  attr_accessor :position
+  attr_reader :board, :color, :move_count, :position
 
   def initialize(position, board, color)
     @position = position
     @color = color
     @board = board
+    @move_count = 0
+  end
+
+  def position=(pos)
+    @position = pos
+    @move_count += 1
   end
 
   def self.step_in_direction(direction, position)
@@ -122,6 +127,17 @@ class King < SteppingPiece
     "\u265A"
   end
 
+  def intermediate_castling_position(ending_position)
+    [position[0] , position[1] + ((ending_position[1] - position[1]) / 2)]
+  end
+
+  def castle_into_check?(ending_position)
+    intermediate_position = intermediate_castling_position(ending_position)
+    bdup = @board.dup
+    return true if bdup.move!(position, intermediate_position).in_check?(color)
+    bdup.move!(intermediate_position, ending_position).in_check?(color)
+  end
+
   def move_dirs
     [[1, 1], [1, -1], [-1, -1], [-1, 1], [1, 0], [0, 1], [-1, 0], [0, -1]]
   end
@@ -156,6 +172,27 @@ class Pawn < Piece
 
   def moves
     forward_moves + diagonal_moves
+  end
+
+  def is_en_passant?(end_pos)
+    start_row = color == :white ? 3 : 4
+    end_row = color == :white ? 2 : 5
+
+    move_direction = row_change
+    other_piece = board[[position[0], end_pos[1]]]
+    position[0] == start_row &&
+      end_pos[0] == end_row &&
+      (end_pos[1] - position[1]).abs == 1 &&
+      board.empty?(end_pos) &&
+      other_piece.is_a?(Pawn) &&
+      other_piece.color != color &&
+      other_piece.move_count == 1 &&
+      board.last_move == [position[0], end_pos[1]]
+  end
+
+  def promoted?
+    promo_row = color == :white ? 0 : 7
+    position[0] == promo_row
   end
 
   private
