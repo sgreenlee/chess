@@ -14,7 +14,7 @@ class Display
   def build_row(row, i)
     row.map.with_index do |piece, j|
       color_options = color_tile(i, j)
-      ( "   ").colorize(color_options) # TODO: fix this
+      (piece|| "   ").to_s.colorize(color_options) # TODO: fix this
     end
   end
 
@@ -31,7 +31,7 @@ class Display
     if [row, col] == @cursor_pos
       bg = :green
     elsif (row + col) % 2 == 0
-      bg = :white
+      bg = :blue
     elsif (row + col) % 2 != 0
       bg = :black
     end
@@ -41,5 +41,6 @@ class Display
   def render
     system("clear")
     build_grid.each { |row| puts row.join() }
+    nil
   end
 end

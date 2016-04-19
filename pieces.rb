@@ -53,6 +53,10 @@ class Bishop < SlidingPiece
   def move_dirs
     [[1, 1], [1, -1], [-1, -1], [-1, 1]]
   end
+
+  def to_s
+    " #{(color == :white ? "\u2657" : "\u265D").encode('utf-8')} "
+  end
 end
 
 class Rook < SlidingPiece
@@ -60,12 +64,20 @@ class Rook < SlidingPiece
   def move_dirs
     [[1, 0], [0, 1], [-1, 0], [0, -1]]
   end
+
+  def to_s
+    " #{(color == :white ? "\u2656" : "\u265C").encode('utf-8')} "
+  end
 end
 
 class Queen < SlidingPiece
 
   def move_dirs
     [[1, 1], [1, -1], [-1, -1], [-1, 1], [1, 0], [0, 1], [-1, 0], [0, -1]]
+  end
+
+  def to_s
+    " #{(color == :white ? "\u2655" : "\u265B").encode('utf-8')} "
   end
 end
 
@@ -91,12 +103,20 @@ class King < SteppingPiece
   def move_dirs
     [[1, 1], [1, -1], [-1, -1], [-1, 1], [1, 0], [0, 1], [-1, 0], [0, -1]]
   end
+
+  def to_s
+    " #{(color == :white ? "\u2654" : "\u265A").encode('utf-8')} "
+  end
 end
 
 class Knight < SteppingPiece
 
   def move_dirs
     [[2, 1], [2, -1], [-2, 1], [-2, -1], [1, 2], [1, -2], [-1, 2], [-1, -2]]
+  end
+
+  def to_s
+    " #{(color == :white ? "\u2658" : "\u265E").encode('utf-8')} "
   end
 end
 
@@ -124,6 +144,10 @@ class Pawn < Piece
       moves << pos if board[pos].nil?
     end
     moves
+  end
+
+  def to_s
+    " #{(color == :white ? "\u2659" : "\u265F").encode('utf-8')} "
   end
 
 end
