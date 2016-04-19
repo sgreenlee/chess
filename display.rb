@@ -37,7 +37,7 @@ class Display
       if piece.is_a?(King) && @board.in_check?(piece.color)
         color_options[:background] = :red
       end
-      (piece|| "   ").to_s.colorize(color_options) # TODO: fix this
+      (piece||"   ").to_s.colorize(color_options) 
     end
   end
 

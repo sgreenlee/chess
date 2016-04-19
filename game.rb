@@ -24,8 +24,7 @@ class Game
   end
 
   def handle_input(start_pos, ending_position)
-    # if board.color_at(start_pos) == current_player
-    if board[start_pos] && board[start_pos].color == current_player
+    if board.color_at(start_pos) == current_player
       board.move(start_pos, ending_position)
       switch_player!
     else

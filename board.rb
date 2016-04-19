@@ -12,50 +12,45 @@ class Board
   end
 
   def populate
-
-    # populate black pieces
-    rows[1].each_index do |col|
-      Pawn.new([1, col], self, :black)
+    [[1, :black], [6, :white]].each do |row , color|
+      8.times do |col|
+        self[[row, col]] = Pawn.new([row, col], self, color)
+      end
     end
 
-    Rook.new([0, 0], self, :black)
-    Rook.new([0, 7], self, :black)
-    Knight.new([0, 1], self, :black)
-    Knight.new([0, 6], self, :black)
-    Bishop.new([0, 5], self, :black)
-    Bishop.new([0, 2], self, :black)
-    Queen.new([0, 3], self, :black)
-    King.new([0, 4], self, :black)
-
-    # populate white pieces
-    rows[6].each_index do |col|
-      Pawn.new([6, col], self, :white)
+    [[0, :black], [7, :white]].each do |row, color|
+      self[[row, 0]] = Rook.new([row, 0], self, color)
+      self[[row, 7]] = Rook.new([row, 7], self, color)
+      self[[row, 1]] = Knight.new([row, 1], self, color)
+      self[[row, 6]] = Knight.new([row, 6], self, color)
+      self[[row, 5]] = Bishop.new([row, 5], self, color)
+      self[[row, 2]] = Bishop.new([row, 2], self, color)
+      self[[row, 3]] = Queen.new([row, 3], self, color)
+      self[[row, 4]] = King.new([row, 4], self, color)
     end
-
-    Rook.new([7, 0], self, :white)
-    Rook.new([7, 7], self, :white)
-    Knight.new([7, 1], self, :white)
-    Knight.new([7, 6], self, :white)
-    Bishop.new([7, 5], self, :white)
-    Bishop.new([7, 2], self, :white)
-    Queen.new([7, 3], self, :white)
-    King.new([7, 4], self, :white)
   end
 
   def rows
     @grid
   end
 
+  def color_at(pos)
+    self[pos].nil? ? nil : self[pos].color
+  end
+
   def dup
     duped_board = Board.new
     rows.each_with_index do |row, row_idx|
       row.each_with_index do |piece, col|
-        piece.dup.add_to_board(duped_board) unless piece.nil?
-        # piece.class.new
+        unless piece.nil?
+          pos = [row_idx, col]
+          duped_board[pos] = piece.class.new(pos, duped_board, piece.color)
+        end
       end
     end
     duped_board
   end
+
 
   def move(start, end_pos)
     piece = self[start]
@@ -96,7 +91,6 @@ class Board
   end
 
   def in_check?(color)
-    # find kings position
     king_pos = find_king(color)
     enemy_pieces(color).any? { |piece| piece.moves.include?(king_pos) }
   end

@@ -8,16 +8,10 @@ class Piece
     @position = position
     @color = color
     @board = board
-    board[position] = self
   end
 
   def self.step_in_direction(direction, position)
     [direction[0] + position[0], direction[1] + position[1]]
-  end
-
-  def add_to_board(board)
-    @board = board
-    board[position] = self
   end
 
   def move_into_check?(ending_position)
@@ -28,10 +22,13 @@ class Piece
     moves.delete_if { |move| move_into_check?(move) }
   end
 
+  def to_s
+    " #{(color == :black ? black_code : white_code)} "
+  end
 end
 
-class SlidingPiece < Piece
 
+class SlidingPiece < Piece
   def moves
     moves = []
 
@@ -49,51 +46,55 @@ class SlidingPiece < Piece
         moves << pos
       end
     end
-
     moves
   end
-
-
 end
 
-class Bishop < SlidingPiece
 
-  # def initialize(position, board, color)
-  #   @board = board
-  #   @position = position
-  #   @color = color
-  # end
+class Bishop < SlidingPiece
+  def black_code
+    "\u2657"
+  end
+
+  def white_code
+    "\u265D"
+  end
 
   def move_dirs
     [[1, 1], [1, -1], [-1, -1], [-1, 1]]
   end
-
-  def to_s
-    " #{(color == :black ? "\u2657" : "\u265D").encode('utf-8')} "
-  end
 end
 
+
 class Rook < SlidingPiece
+  def black_code
+    "\u2656"
+  end
+
+  def white_code
+    "\u265C"
+  end
 
   def move_dirs
     [[1, 0], [0, 1], [-1, 0], [0, -1]]
   end
 
-  def to_s
-    " #{(color == :black ? "\u2656" : "\u265C").encode('utf-8')} "
-  end
 end
 
 class Queen < SlidingPiece
+  def black_code
+    "\u2655"
+  end
+
+  def white_code
+    "\u265B"
+  end
 
   def move_dirs
     [[1, 1], [1, -1], [-1, -1], [-1, 1], [1, 0], [0, 1], [-1, 0], [0, -1]]
   end
-
-  def to_s
-    " #{(color == :black ? "\u2655" : "\u265B").encode('utf-8')} "
-  end
 end
+
 
 class SteppingPiece < Piece
   def moves
@@ -113,52 +114,78 @@ class SteppingPiece < Piece
 end
 
 class King < SteppingPiece
+  def black_code
+    "\u2654"
+  end
+
+  def white_code
+    "\u265A"
+  end
 
   def move_dirs
     [[1, 1], [1, -1], [-1, -1], [-1, 1], [1, 0], [0, 1], [-1, 0], [0, -1]]
   end
 
-  def to_s
-    " #{(color == :black ? "\u2654" : "\u265A").encode('utf-8')} "
-  end
+
 end
 
 class Knight < SteppingPiece
+
+  def black_code
+    "\u2658"
+  end
+
+  def white_code
+    "\u265E"
+  end
 
   def move_dirs
     [[2, 1], [2, -1], [-2, 1], [-2, -1], [1, 2], [1, -2], [-1, 2], [-1, -2]]
   end
 
-  def to_s
-    " #{(color == :black ? "\u2658" : "\u265E").encode('utf-8')} "
-  end
 end
 
 class Pawn < Piece
+  def black_code
+    "\u2659"
+  end
+
+  def white_code
+    "\u265F"
+  end
 
   def moves
+    forward_moves + diagonal_moves
+  end
+
+  private
+
+  def row_change
+    color == :white ? -1 : 1
+  end
+
+  def starting_row
+    color == :white ? 6 : 1
+  end
+
+  def diagonal_moves
     moves = []
-    row_change = color == :white ? -1 : 1
-    starting_row = color == :white ? 6 : 1
-
-    forward = Piece.step_in_direction([row_change, 0], position)
-    moves << forward if board[forward].nil?
-
     [-1, 1].each do |diagonal|
       pos = Piece.step_in_direction([row_change, diagonal], position)
       moves << pos if board[pos] && board[pos].color != self.color
     end
+    moves
+  end
+
+  def forward_moves
+    moves = []
+    forward = Piece.step_in_direction([row_change, 0], position)
+    moves << forward if board[forward].nil?
 
     if position[0] == starting_row
       pos = Piece.step_in_direction([row_change * 2, 0], position)
       moves << pos if board[pos].nil?
     end
-
     moves
   end
-
-  def to_s
-    " #{(color == :black ? "\u2659" : "\u265F").encode('utf-8')} "
-  end
-
 end
